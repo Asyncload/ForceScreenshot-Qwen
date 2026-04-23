@@ -35,7 +35,9 @@ jobs:
       - name: Upload Release APK
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ github.run_number }}  # 用构建号作为版本标签，每次构建都会自动生成新标签
+          name: X-screen
+          tag_name: X-screen-v${{ github.run_number }}  # 用构建号作为版本标签，每次构建都会自动生成新标签
+          
           files: |
             app/build/outputs/apk/release/*.apk
             overwrite_files: true
