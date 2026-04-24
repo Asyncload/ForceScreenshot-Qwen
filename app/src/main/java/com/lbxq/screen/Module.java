@@ -1,4 +1,4 @@
-package com.example.forcescreenshot;
+package com.lbxq.screen;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XposedBridge;
