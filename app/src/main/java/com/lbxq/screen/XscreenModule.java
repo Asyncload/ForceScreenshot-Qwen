@@ -5,7 +5,7 @@ import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 // LSPosed 模块入口，兼容 API 101
-public class Module implements IXposedHookLoadPackage {
+public class XscreenModule implements IXposedHookLoadPackage {
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) {
         if (lpparam.packageName.equals("com.android.systemui")) {
