@@ -66,10 +66,10 @@ jobs:
           # 获取当前日期，格式为YYYY-MM-DD
           DATE=$(date +%Y-%m-%d)
           # 获取当前时间, 格式为HHMMSS
-          TIME=$(date +%H:%M:%S)
+          NEW_TIME=$(date +%H:%M:%S)
           
           #自定义时间
-          echo "TIME=$TIME" >> $GITHUB_ENV
+          echo "NEW_TIME=$NEW_TIME" >> $GITHUB_ENV
           # 自定义文件名格式
           NEW_NAME="X-screen_v${VERSION}_${DATE}.apk"
           # 用签名后的文件改名
@@ -90,6 +90,6 @@ jobs:
           #内容
           body: |
            ✅编译完成！
-            编译时间: ${{ env.DATE }} & ${{ env.TIME }}
+            编译时间: ${{ env.DATE }} & ${{ env.NEW_TIME }}
           # 允许覆盖已存在的文件
           overwrite_files: true
