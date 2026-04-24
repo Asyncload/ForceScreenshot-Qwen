@@ -1,12 +1,51 @@
-<meta-data
-    android:name="xposedmodule"
-    android:value="true" />
-<meta-data
-    android:name="xposeddescription"
-    android:value="强制截图模块" />
-<meta-data
-    android:name="xposedminversion"
-    android:value="101" />
-<meta-data
-    android:name="xposed_init"
-    android:value="com.lbxq.screen.XscreenModule" />
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.lbxq.screen">
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE" />
+
+    <application
+        android:label="X-screen"
+        tools:ignore="HardcodedDebugMode,MissingApplicationIcon"
+        android:requestLegacyExternalStorage="true">
+
+        <activity
+            android:name="com.lbxq.screen.MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name="com.lbxq.screen.XscreenService"
+            android:label="截图服务"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+        </service>
+
+        <!-- 这里是你的LSPosed配置，完全正确 -->
+        <meta-data
+            android:name="xposedmodule"
+            android:value="true" />
+        <meta-data
+            android:name="xposeddescription"
+            android:value="强制截图模块" />
+        <meta-data
+            android:name="xposedminversion"
+            android:value="82" />
+        <meta-data
+            android:name="xposed_init"
+            android:value="com.lbxq.screen.XscreenModule" />
+
+    </application>
+
+</manifest>
