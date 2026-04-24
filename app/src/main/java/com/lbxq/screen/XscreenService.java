@@ -6,7 +6,7 @@ import android.util.Log;
 import java.io.IOException;
 
 // 通过系统命令实现后台截图（root设备专用）
-public class Service extends AccessibilityService {
+public class XscreenService extends AccessibilityService {
     private static final String TAG = "ScreenshotService";
 
     @Override
