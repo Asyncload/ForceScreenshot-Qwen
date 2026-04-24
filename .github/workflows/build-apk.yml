@@ -81,6 +81,6 @@ jobs:
           # 上传的文件路径（使用上面步骤设置的环境变量）
           files: ${{ env.APK_FILE }}
           # 标签名，每次都会覆盖更新
-          tag_name: latest
+          tag_name: V${VERSION}
           # 允许覆盖已存在的文件
           overwrite_files: true
