@@ -1,4 +1,4 @@
-name: Build APK
+pname: Build APK
 
 # 触发条件：main分支推送时自动构建，也支持手动触发
 on:
@@ -65,9 +65,11 @@ jobs:
           VERSION=$(grep versionName app/build.gradle | awk '{print $2}' | tr -d '"')
           # 获取当前日期，格式为YYYY-MM-DD
           DATE=$(date +%Y-%m-%d)
-          # 获取当前时间, 格式为HH:MM:SS
+          # 获取当前时间, 格式为HHMMSS
           TIME=$(date +%H:%M:%S)
           
+          #自定义时间
+          echo "TIME=$TIME" >> $GITHUB_ENV
           # 自定义文件名格式
           NEW_NAME="X-screen_v${VERSION}_${DATE}.apk"
           # 用签名后的文件改名
@@ -84,6 +86,8 @@ jobs:
           # 上传的文件路径（使用上面步骤设置的环境变量）
           files: ${{ env.APK_FILE }}
           # 标签名，每次都会覆盖更新
-          tag_name: V_${{ env.TIME }}
+          tag_name: V_${{ env.VERSION }}
+          #内容
+          body:✅完成编译: ${{ env.DATE }} & ${{ env.TIME }}
           # 允许覆盖已存在的文件
           overwrite_files: true
