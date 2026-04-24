@@ -22,11 +22,11 @@ android {
         // 目标系统版本：Android 15（API 35）
         targetSdk 35
 
-        // 版本号（数字，用于系统识别更新）
-        versionCode 1.0.0
+        // 版本号（必须是整数，用于系统识别更新）
+        versionCode 1
         // 版本名（字符串，给用户看的）
-        versionName "X_screen"
-        
+        versionName "1.0.0"
+    } 
 
     // 构建类型：release（发布版）和debug（调试版）的配置
     buildTypes {
@@ -58,10 +58,10 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
     // 忽略无图标等资源警告，防止编译失败
-     lint {
-         abortOnError false
-         checkReleaseBuilds false
-     }
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+    }
 }
 
 // 依赖配置块
@@ -71,7 +71,7 @@ dependencies {
 
     // AndroidX AppCompat 依赖，用来支持你的MainActivity和AndroidX特性
     // AndroidX AppCompat，强制排除重复的Kotlin标准库
-    implementation ('androidx.appcompat:appcompat:1.7.0'){
+    implementation('androidx.appcompat:appcompat:1.7.0') {
         exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib'
         exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
         exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
