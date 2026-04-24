@@ -40,9 +40,9 @@ jobs:
       - name: 生成临时签名密钥
         run: |
            keytool -genkey -v -keystore my-release-key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias myalias -storepass password789 -keypass password789 -dname "CN=Unknown, OU=Unknown, O=Unknown, L=Unknown, S=Unknown, C=Unknown"
-      - name: 签名 APK
+      - name: 用 jarsigner 签名 APK
         run: |
-           apksigner sign --ks my-release-key.jks --ks-pass pass:password789 --key-pass pass:password789 --alias myalias app/build/outputs/apk/release/app-release.apk
+           jarsigner -verbose -keystore temp-key.jks -storepass temp123 -keypass temp123 \ -signedjar app/build/outputs/apk/release/app-release-signed.apk \ app/build/outputs/apk/release/app-release.apk tempalias
 
       # 动态改名
       - name: Rename APK
