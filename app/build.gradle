@@ -59,3 +59,11 @@ android {
 }
     
 }
+    configurations.all {
+    resolutionStrategy {
+        // 强制使用 1.8.22 版本（或者你项目中使用的最新版）
+        force 'org.jetbrains.kotlin:kotlin-stdlib:1.8.22'
+        force 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22'
+        force 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22'
+    }
+    }
