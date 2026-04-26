@@ -22,7 +22,7 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
-        
+
       - name: Fix gradlew line endings
         run: sed -i 's/\r$//' gradlew
 
@@ -30,14 +30,14 @@ jobs:
         run: chmod +x gradlew
 
       # ==============================================
-      # 【前置】自增版本号 → 写入app/build.gradle
+      # 【前置】自增版本号 → 写入app/build.gradle.kts
       # ==============================================
       - name: Update the version number
         run: |
-          echo "📝 build.gradle中versionName行原始内容："
-          grep versionName app/build.gradle
+          echo "📝 build.gradle.kts中versionName行原始内容："
+          grep versionName app/build.gradle.kts
 
-          OLD_VER=$(grep versionName app/build.gradle | awk '{print $NF}' | tr -d '"' | tr -d "'")
+          OLD_VER=$(grep versionName app/build.gradle.kts | awk '{print $NF}' | tr -d '"' | tr -d "'")
           echo "🔍 读取到旧版本号: $OLD_VER"
 
           V1=$(echo $OLD_VER | cut -d'.' -f1)
@@ -56,14 +56,14 @@ jobs:
           NEW_VER="${V1}.${V2}.${V3}"
           echo "✅ 计算得到新版本号: $NEW_VER"
 
-          sed -i "s/versionName\s*=\?\s*[\"'].*[\"']/versionName = \"${NEW_VER}\"/g" app/build.gradle
+          sed -i "s/versionName\s*=\?\s*[\"'].*[\"']/versionName = \"${NEW_VER}\"/g" app/build.gradle.kts
           
-          UPDATED_VER=$(grep versionName app/build.gradle | awk '{print $NF}' | tr -d '"' | tr -d "'")
+          UPDATED_VER=$(grep versionName app/build.gradle.kts | awk '{print $NF}' | tr -d '"' | tr -d "'")
           if [ "$UPDATED_VER" != "$NEW_VER" ]; then
-            echo "❌ 版本号写入失败！当前文件中的值: $UPDATED_VER"
+            echo "❗ 版本号写入失败！当前文件中的值: $UPDATED_VER"
             exit 1
           fi
-          echo "✅ 版本号已成功写入build.gradle"
+          echo "✅ 版本号已成功写入build.gradle.kts"
 
           DATE=$(date +%Y-%m-%d)
           TIME=$(date +%H:%M:%S)
@@ -72,7 +72,7 @@ jobs:
           echo "DATE=$DATE" >> $GITHUB_ENV
           echo "BUILD_TIME=$TIME" >> $GITHUB_ENV
 
-      # 正常编译（现在编译用的是【新版本号】）
+      # 正常编译（现在编译用的是【新版本号】）& 并清除缓存
       - name: Build Release APK
         run: ./gradlew clean assembleRelease --no-build-cache
 
@@ -107,23 +107,23 @@ jobs:
           mv app/build/outputs/apk/release/app-release-signed.apk app/build/outputs/apk/release/$NEW_NAME
           echo "APK_FILE=app/build/outputs/apk/release/$NEW_NAME" >> $GITHUB_ENV
 
-          git add app/build.gradle
+          git add app/build.gradle.kts
           if ! git diff --cached --quiet; then
             git commit -m "chore: 自动迭代版本至 ${VERSION} [skip ci]"
             git push
             echo "✅ 版本号变更已提交并推送至仓库"
           else
-            echo "ℹ️ 无版本号变更，跳过提交"
+            echo "⚠️ 无版本号变更，跳过提交"
           fi
        #发布apk文件
       - name: Upload Release APK
         uses: softprops/action-gh-release@v2
         with:
-          name: "X-screen-v${{ github.run_number }} (v${{ env.VERSION }})"
+          name: "X-JT-v${{ github.run_number }} (v${{ env.VERSION }})"
           files: ${{ env.APK_FILE }}
           tag_name: "v${{ env.VERSION }}"
           body: |
-            ✅ 编译完成！
+            ✅ 编译完成！ 🎉🎉🎉
             📱 应用版本: v${{ env.VERSION }}
             📅 编译时间: ${{ env.DATE }} ${{ env.BUILD_TIME }}
             📦 构建编号: ${{ github.run_number }}
