@@ -65,13 +65,6 @@ jobs:
           fi
           echo "✅ 版本号已成功写入build.gradle"
 
-          DATE=$(date +%Y-%m-%d)
-          TIME=$(date +%H:%M:%S)
-
-          echo "VERSION=$NEW_VER" >> $GITHUB_ENV
-          echo "DATE=$DATE" >> $GITHUB_ENV
-          echo "BUILD_TIME=$TIME" >> $GITHUB_ENV
-
       # 正常编译（现在编译用的是【新版本号】）& 并清除缓存
       - name: Build Release APK
         run: ./gradlew clean assembleRelease --no-build-cache
@@ -114,18 +107,50 @@ jobs:
             echo "✅ 版本号变更已提交并推送至仓库"
           else
             echo "⚠️ 无版本号变更，跳过提交"
-          fi
-       #发布apk文件
+          fi  
+          
+      - name: All kinds of data variables
+        run: 
+          DATE= $(date +%Y-%m-%d)
+          TIME= $(date +%H:%M:%S)
+
+          echo "VERSION=$NEW_VER" >> $GITHUB_ENV
+          echo "DATE=$DATE" >> $GITHUB_ENV
+          echo "BUILD_TIME=$TIME" >> $GITHUB_ENV
+
+
+
+      - name: Build Changelog
+        id: changelog
+        uses: mikepenz/release-changelog-builder-action@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commitMode: true
+
+      - name: Build Full Release Body
+        id: build_boby
+        run: | 
+           FULL_BODY='## 自定义内容
+           ✅ 编译完成！ 🎉🎉🎉
+            📱 应用版本: v_${ env.VERSION }
+            📅 编译时间: ${ env.DATE } ${ env.BUILD_TIME }
+            📦 构建编号: ${ github.run_number }
+            🛠️ 功能: 解除某些APP屏蔽了截图权限。
+
+           ${{ steps.changelog.outputs.changelog }}'
+  
+           EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+           echo "full_body<<$EOF" >> $GITHUB_OUTPUT
+           echo "$FULL_BODY" >> $GITHUB_OUTPUT
+           echo "$EOF" >> $GITHUB_OUTPUT
+    
+
+      #发布apk文件
       - name: Upload Release APK
         uses: softprops/action-gh-release@v2
         with:
-          name: "X-screen-v${{ github.run_number }} (v${{ env.VERSION }})"
-          files: ${{ env.APK_FILE }}
-          tag_name: "v${{ env.VERSION }}"
-          body: |
-            ✅ 编译完成！ 🎉🎉🎉
-            📱 应用版本: v${{ env.VERSION }}
-            📅 编译时间: ${{ env.DATE }} ${{ env.BUILD_TIME }}
-            📦 构建编号: ${{ github.run_number }}
-            🛠️ 功能: 解除某些APP屏蔽了截图权限。
+          name: X-screen-v${{ github.run_number }} (v${ env.VERSION })
+          files: ${ env.APK_FILE }
+          tag_name: "v${ env.VERSION }"
+          body:  ${ steps.build_body.outputs.full_body }
           overwrite_files: true
