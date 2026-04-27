@@ -1,84 +1,67 @@
-// 声明这是一个Android应用模块
 plugins {
     id 'com.android.application'
 }
 
-// Android项目核心配置块
 android {
-    // 命名空间（Gradle 新版必须，替代旧版package声明）
     namespace 'com.lbxq.screen'
-
-    // 编译SDK版本（对应Android 15，API 35）
     compileSdk 35
 
-    // 默认配置：所有构建变体共享的基础设置
-    defaultConfig {
-        // 应用包名（必须和你在AndroidManifest.xml里的一致）
-        applicationId "com.lbxq.screen"
-
-        // 最低兼容系统版本：Android 10.0（API 29）
-        minSdk 29
-
-        // 目标系统版本：Android 15（API 35）
-        targetSdk 35
-
-        // 版本号（必须是整数，用于系统识别更新）
-        versionCode 1
-        // 版本名（字符串，给用户看的）
-        versionName = "1.2.33"
-    } 
-
-    // 构建类型：release（发布版）和debug（调试版）的配置
-    buildTypes {
-        // release 构建配置（最终打包用的）
+    // 签名配置：从环境变量读取（供 GitHub Actions 使用）
+    signingConfigs {
         release {
-            // 不开启代码混淆（true会压缩代码，模块开发初期建议false，避免Hook失效）
+            def keystorePath = System.getenv("KEYSTORE_PATH")
+            if (keystorePath != null && file(keystorePath).exists()) {
+                storeFile file(keystorePath)
+                storePassword System.getenv("KEYSTORE_PASSWORD")
+                keyAlias System.getenv("KEY_ALIAS")
+                keyPassword System.getenv("KEY_PASSWORD") ?: System.getenv("KEYSTORE_PASSWORD")
+                println "✅ 使用环境变量签名配置"
+            } else {
+                println "⚠️ 未找到签名环境变量，release 构建将使用 debug 签名（仅本地测试）"
+            }
+        }
+    }
+
+    defaultConfig {
+        applicationId "com.lbxq.screen"
+        minSdk 29
+        targetSdk 35
+        versionCode 1
+        versionName "1.2.33"
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
             minifyEnabled false
-            // 不开启资源压缩（同上，开发初期建议false）
             shrinkResources false
-            // 混淆规则文件（默认+自定义，这里只用默认的）
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt')
         }
-
-        // debug 构建配置（调试用）
         debug {
-            // 给调试版包名加后缀，避免和正式版冲突
             applicationIdSuffix ".debug"
-            // 调试版不开启混淆和资源压缩
             minifyEnabled false
             shrinkResources false
         }
     }
 
-    // 编译选项：指定JDK版本
     compileOptions {
-        // 源代码使用Java 17语法
         sourceCompatibility JavaVersion.VERSION_17
-        // 生成的字节码兼容Java 17
         targetCompatibility JavaVersion.VERSION_17
     }
-    // 忽略无图标等资源警告，防止编译失败
+
     lint {
         abortOnError false
         checkReleaseBuilds false
     }
 }
 
-// 依赖配置块
 dependencies {
-    // Xposed/LSPosed 模块核心API（compileOnly表示仅编译时依赖，不打包进APK）
-    // 这两行是 Xposed/LSP 专属，必须用 api:82 适配你的 API101
     compileOnly 'de.robv.android.xposed:api:82'
     compileOnly 'de.robv.android.xposed:api:82:sources'
-
-    // AndroidX AppCompat 依赖，用来支持你的MainActivity和AndroidX特性
-    // AndroidX AppCompat，强制排除重复的Kotlin标准库
     implementation('androidx.appcompat:appcompat:1.7.0') {
         exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib'
         exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
         exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
     }
-
-    // 新增：解决 constraintLayout 布局属性报错
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 }
