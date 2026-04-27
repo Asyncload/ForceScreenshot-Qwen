@@ -143,8 +143,8 @@ jobs:
       - name: Create Release & upload APK
         uses: softprops/action-gh-release@v2
         with:
-          name: "X-screen_#${{ github.run_number }} | v${{ env.NEW_VER }}"
-          tag_name: "v${{ env.NEW_VER }}"
+          name: "X-screen_v${{ env.NEW_VER }}"
+          tag_name: "v_${{ env.NEW_VER }}" #${{ github.run_number }}
           files: ${{ env.APK_FILE }}
           body: ${{ steps.build_body.outputs.full_body }}
           overwrite_files: true
