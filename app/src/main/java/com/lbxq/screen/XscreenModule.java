@@ -20,7 +20,7 @@ public class XscreenModule implements IXposedHookLoadPackage {
         PACKAGE_NAMES.put("com.eg.android.AlipayGphone", "支付宝");
         PACKAGE_NAMES.put("com.ss.android.ugc.aweme", "抖音");
         PACKAGE_NAMES.put("com.sankuai.meituan", "美团");
-        PACKAGE_NAMES.put("com.sankuai.meituan.dispatch.crowdsource.delivery", "美团众包");
+        PACKAGE_NAMES.put("com.sankuai.meituan.dispatch.crowdsource", "美团众包");
         PACKAGE_NAMES.put("me.ele.crowdsource", "蜂鸟众包");
     }
 
