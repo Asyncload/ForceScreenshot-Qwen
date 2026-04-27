@@ -30,7 +30,6 @@ jobs:
         run: |
           sed -i 's/\r$//' gradlew
           chmod +x gradlew
-
       # 自动版本号自增 每次+5，99进位
       - name: Auto increment version
         run: |
@@ -49,13 +48,11 @@ jobs:
           NEW_VER="${V1}.${V2}.${V3}"
           sed -i "s/versionName\s*=.*[\"'].*[\"']/versionName = \"${NEW_VER}\"/g" app/build.gradle
           echo "NEW_VER=$NEW_VER" >> "$GITHUB_ENV"
-
       # 生成编译日期时间变量
       - name: Set build datetime
         run: |
           echo "DATE=$(date +%Y-%m-%d)" >> "$GITHUB_ENV"
           echo "BUILD_TIME=$(date +%H:%M:%S)" >> "$GITHUB_ENV"
-
       # 编译Release正式包
       - name: Build Release APK
         run: ./gradlew clean assembleRelease --no-build-cache
@@ -67,11 +64,16 @@ jobs:
       # zipalign对齐 + apksigner签名（解决jarsigner兼容问题，支持V1/V2/V3签名）
       - name: Align & Sign APK
         run: |
-          $BUILD_TOOLS/apksigner
+          # 先定义所有变量（必须放在最前面！）
+          BUILD_TOOLS="$ANDROID_HOME/build-tools/34.0.0"
           UNSIGNED=app/build/outputs/apk/release/app-release-unsigned.apk
           ALIGNED=app/build/outputs/apk/release/app-release-aligned.apk
           SIGNED=app/build/outputs/apk/release/app-release-signed.apk
-          
+
+          # 可选：检查build-tools路径是否存在（排错用，可保留）
+          echo "Checking build-tools path: $BUILD_TOOLS"
+          ls -la "$BUILD_TOOLS" || echo "❌ Path not found! Available build-tools:" && ls -la "$ANDROID_HOME/build-tools/"
+
           # 1. 对齐APK（优化文件结构，提升运行效率）
           "$BUILD_TOOLS/zipalign" -v -p 4 "$UNSIGNED" "$ALIGNED"
           
@@ -88,7 +90,6 @@ jobs:
           
           # 清理临时密钥文件
           rm -f my-release-key.jks
-
       # 重命名APK + 提交版本号变更并推送
       - name: Rename APK & commit version
         run: |
@@ -104,7 +105,6 @@ jobs:
             git commit -m "chore: auto bump version to ${{ env.NEW_VER }} [skip ci]"
             git push
           fi
-
       # 自动生成提交日志更新内容
       - name: Generate changelog
         id: changelog
@@ -123,14 +123,12 @@ jobs:
           📅 编译时间：${{ env.DATE }} ${{ env.BUILD_TIME }}
           📦 构建编号：${{ github.run_number }}
           🛠️ 功能：解除部分APP截图权限限制
-
           ${{ steps.changelog.outputs.changelog }}"
           
           EOF=$(head -c15 /dev/urandom | base64)
           echo "full_body<<$EOF" >> "$GITHUB_OUTPUT"
           echo "$FULL_BODY" >> "$GITHUB_OUTPUT"
           echo "$EOF" >> "$GITHUB_OUTPUT"
-
       # 创建Release、打Tag、上传APK附件
       - name: Create Release & upload APK
         uses: softprops/action-gh-release@v2
